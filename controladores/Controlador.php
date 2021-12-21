@@ -63,29 +63,24 @@ class Controlador
                         break;
                 }
             }
-
+            
             //fecha de Nacimiento
             if(isset($_POST['fechaN'])){
                 $fechaN= $_POST['fechaN'];
                 $resultado .= "<br>fecha de Nacimiento: $fechaN";
             }
+            else{
+                "";
+            }
             
-            $lesiones = "";
-          if(isset($_POST["rodilla"])){
-                $lesiones .= "Lesión en la rodilla</br>";
-          }
-          if(isset($_POST["hombro"])){
-            $lesiones .= "Lesión en el hombro</br>";
-         }
-         if(isset($_POST["tobillo"])){
-            $lesiones .= "Lesión en el tobillo</br>";
-         }
-         if(isset($_POST["dedos"])){
-            $lesiones .= "Lesión en los Dedos</br>";
-         }
-            
-            if(isset($lesiones)){
-                $resultado .= "</br>Presenta las siguientes lesiones $lesiones";
+             
+            if(isset($_POST["lesiones"])){
+                $lesiones = $_POST["lesiones"];
+                $resultado .= "</br>Presenta las siguientes lesiones: ";
+                foreach($lesiones as $lesion){
+                    $resultado .= "<br>Lesión en $lesion";
+                }
+                
             }
             else{
                 $resultado .= "</br>NO PRESENTA LESIÓN ALGUNA ";
