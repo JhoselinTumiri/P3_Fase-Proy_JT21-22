@@ -10,7 +10,7 @@ class Controlador
 			exit();
         } else
         {
-            $resultado ="Bienvenido/a ";
+            $resultado ="<center><b> COMPROBANTE DE INSCRIPCIÓN</b></center></br>";
             //el formulario ya se ha enviado
             //se recogen y procesan los datos
             //se llama al método para mostrar el resultado
@@ -23,14 +23,14 @@ class Controlador
             //Se registra el primer apellido en caso de que se haya marcado la casilla Sin 2Ap 
             if (!empty($_POST['apellido1']) && empty($_POST['apellido2']) && isset($_POST['sin2AP'])){
             $apellido1=$_POST['apellido1'];
-            $resultado .= " $apellido1 <br />";
+            $resultado .= " $apellido1 se ha registrado correctamente <br />";
             }
 
             //Mostrar los 2 apellidos
             if (!empty($_POST['apellido1']) && !empty($_POST['apellido2'])){
                 $apellido1=$_POST['apellido1'];
                 $apellido2=$_POST['apellido2'];
-                $resultado .= " $apellido1 $apellido2 <br />";
+                $resultado .= " $apellido1 $apellido2 se ha resgidtrado correctamente<br />";
                 }
 
             //Mostrar tipo de documento elegido
@@ -45,6 +45,11 @@ class Controlador
                 $resultado .= "</br>Contacto  = $telf <br />";
                 }
             
+            //Mostrar Correo, comprobando que se encuentre. 
+            if (!empty($_POST['email'])){
+                $email = $_POST['email'];
+                $resultado .= "</br>Correo electrónico = $email <br />";
+                }
             //Comprobar el tipo de sexo
             if (isset($_POST['sexo'])) {
                 $sexo = $_POST['sexo'];
@@ -82,8 +87,11 @@ class Controlador
                 $resultado .= "<br>fecha de Nacimiento: $fechaN";
             }
            
-            
-             
+            /*
+             *Comprobar casillas elegidas, se trata como un array, se recorre el array y se muestra
+             *aquellas casillas que se hayan seleccionado, si se encuentra vacia se muestra otro mensaje
+            */
+
             if(isset($_POST["lesiones"])){
                 $lesiones = $_POST["lesiones"];
                 $resultado .= "</br>Presenta las siguientes lesiones: ";
