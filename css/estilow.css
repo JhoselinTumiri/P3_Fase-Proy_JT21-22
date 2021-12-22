@@ -178,3 +178,7 @@ option {
     width: 8em;
     float: left;
 }
+.texto{
+    background-color: #b6aa8b;
+    width: 100%;
+}
