@@ -32,6 +32,18 @@ class Controlador
                 $apellido2=$_POST['apellido2'];
                 $resultado .= " $apellido1 $apellido2 <br />";
                 }
+
+            //Mostrar tipo de documento elegido
+            if (!empty($_POST['dni'])){
+                $dni = $_POST['dni'];
+                $resultado .= "</br>DNI/NIF = $dni <br />";
+                }
+            
+            //Mostrar teléfono
+            if (!empty($_POST['telf'])){
+                $telf = $_POST['telf'];
+                $resultado .= "</br>Contacto  = $telf <br />";
+                }
             
             //Comprobar el tipo de sexo
             if (isset($_POST['sexo'])) {
@@ -69,9 +81,7 @@ class Controlador
                 $fechaN= $_POST['fechaN'];
                 $resultado .= "<br>fecha de Nacimiento: $fechaN";
             }
-            else{
-                "";
-            }
+           
             
              
             if(isset($_POST["lesiones"])){
