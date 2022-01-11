@@ -154,18 +154,23 @@ input[type=radio] {
 
 input[type='checkbox'] {
     width: 2%;
-    margin: 8px;
+    margin: 18px;
     margin-left: 9em;
+}
+input[type='text'] {
+    width: 9em;
+    margin-left: 1em;
 }
 
 select {
-    padding: 10px;
-    height: 5em;
+    padding: 5px;
+    width: 18em;
+    height: 2em;
 }
 
 option {
     min-height: 2em;
-    padding: 2px 2px 2px;
+    padding: 1px 2px 2px;
 }
 
 .comen {
@@ -181,4 +186,18 @@ option {
 .texto{
     background-color: #b6aa8b;
     width: 100%;
+}
+.categoria > h4{
+    margin-top: 7em;
+        margin-left: 10em;
+    
+}
+.datos{
+    margin-left: 5%;
+}
+.dniCasilla{
+
+}
+label{
+    margin-left: 5px;
 }
