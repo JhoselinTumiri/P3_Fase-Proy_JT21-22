@@ -1,5 +1,6 @@
 <?php
 include "cabecera.php";
+include "helper/Input.php";
 ?>
 <form id="form" action="index.php" method="post">
     
@@ -7,16 +8,16 @@ include "cabecera.php";
      <center><h2>Inscripciones Club <br>Navarra Voleibol</h2></center>
         <div class='uno'>
             <label>Nombre</label>
-            <input type="text" name="nombre" />
+            <input type="text" name="nombre" value='<?php echo Input::get('nombre')?>'/>
             <label>Apellido 1 </label>
-            <input type="text" name="apellido1" />
+            <input type="text" name="apellido1" value='<?php echo Input::get('apellido1')?>' />
             
             <label>Apellido 2 </label>
-            <input type="text" name="apellido2" />
+            <input type="text" name="apellido2" value='<?php echo Input::get('apellido2')?>'/>
             <input type="checkbox" name="sin2AP" value="no2ap" />Sin 2º Apellido<br />
             <div class="datos">
             DNI/NIE<select class= "dniCasilla" name="documento" holder="Seleccionar tipo de Documento">
-                 <option value="dni" selected>Seleccionar Tipo de Documento</option>    
+                 <option value="select" selected>Seleccionar Tipo de Documento</option>    
                 <option value="dni">DNI</option>
                 <option value="nif" >NIF</option>
                 <option value="nie">NIE</option>
@@ -39,7 +40,7 @@ include "cabecera.php";
                     <section>
                     <label>&nbsp;</label>
                     <label>Fecha/Nac </label>
-                    <input type="date" name="fechaN" required/>
+                    <input type="date" name="fechaN" value="13/02/1999" />
                     </section>
                    
                 </div>
@@ -54,7 +55,7 @@ include "cabecera.php";
                 </div>
                 <div class='uno'>
                     <label>Presenta Lesiones </label><br />
-                    <input type="checkbox" name="lesiones[]" value="rodilla" />rodilla<br />
+                    <input type="checkbox" name="lesiones[]" value="hola" />rodilla<br />
                     <input type="checkbox" name="lesiones[]" value="hombro" />hombro<br />
                     <input type="checkbox" name="lesiones[]" value="tobillo" />tobillo<br />
                     <input type="checkbox" name="lesiones[]" value="dedos" />dedos<br />
