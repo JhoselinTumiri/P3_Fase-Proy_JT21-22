@@ -1,7 +1,22 @@
 <?php
 include "cabecera.php";
-include "helper/Input.php";
+//include "helper/Input.php";
+include "helper/Utilidades.php";
+
+//Se muestran los errores encontrados en el formulario en esta parte superior
+
+    if(Input::siEnviado()){
+        $errores = $validador->getErrores();
+        if( !empty($errores)){
+            echo "<div class = 'errores'>";
+            foreach($errores as $campo => $mensajeError){
+                echo "<p>$mensajeError";
+            }
+            echo "</div>";
+        }
+    }
 ?>
+
 <form id="form" action="index.php" method="post">
     
     <div>
@@ -14,7 +29,15 @@ include "helper/Input.php";
             
             <label>Apellido 2 </label>
             <input type="text" name="apellido2" value='<?php echo Input::get('apellido2')?>'/>
-            <input type="checkbox" name="sin2AP" value="no2ap" />Sin 2º Apellido<br />
+          <!-- <?/*php
+            $value = "Sin 2ºApellido";
+               echo "<input type='radio' id='$value' name='sin2AP' value='$value'";
+               echo Utilidades::verificaControlRadio(Input::get('sin2AP'), $value);
+               echo "/>";
+               echo "<label for='$value'>$value</label>";
+            
+            echo "<br>";*/?>-->
+            
             <div class="datos">
             DNI/NIE<select class= "dniCasilla" name="documento" holder="Seleccionar tipo de Documento">
                  <option value="select" selected>Seleccionar Tipo de Documento</option>    
@@ -22,56 +45,85 @@ include "helper/Input.php";
                 <option value="nif" >NIF</option>
                 <option value="nie">NIE</option>
             </select>
-            <input type="text" name="dni" /><br /><br>
+            <input type="text" name="dni" value='<?php echo Input::get('dni')?>' /><br /><br>
 
             <label>telf</label>
-            <input type="tel" name="telf" />
+            <input type="tel" name="telf" value='<?php echo Input::get('telf')?>'/>
             <label>Email</label>
-            <input type="email" name="email" /><br />
+            <input type="email" name="email" value='<?php echo Input::get('email')?>' />
             </div>
         </div>
             <div>
                 <div class='uno'>
                     <section>
-                    <label>Sexo</label><br />
-                    <input type="radio" name="sexo" value="hombre" />Hombre
-                    <input type="radio" name="sexo" value="mujer" />Mujer<br />
+                    <h4>Sexo</h4>
+
+                    <?php
+            $generos = array("Hombre", "Mujer");
+            foreach ($generos as $value) {
+               echo "<input type='radio' id='$value' name='sexo' value='$value'";
+               echo Utilidades::verificaControlRadio(Input::get('sexo'), $value);
+               echo "/>";
+               echo "<label for='$value'>$value</label>";
+            }
+            echo "<br>";?>
+                   
+                   
                     </section>
                     <section>
-                    <label>&nbsp;</label>
-                    <label>Fecha/Nac </label>
-                    <input type="date" name="fechaN" value="13/02/1999" />
+                    <!--<label>&nbsp;</label>-->
+                    <label><b>Fecha de Nacimiento</b></label>
+                    <input type="date" name="fechaN" value='<?php echo Input::get('fechaN')?>' />
                     </section>
                    
                 </div>
                 
                 <div class='categoria'>
+                <br />
                     <h4>Categoria</h4><br />
-                    <input type="radio" name="categoria" value="cadete" />Cadete
-                    <input type="radio" name="categoria" value="juvenil" />Juvenil
-                    <input type="radio" name="categoria" value="mayores" />Mayores<br />
-                     <label>&nbsp;</label>
+                    <?php
+            $categoria = array("Cadete", "Juvenil", "Mayores" );
+            foreach ($categoria as $value) {
+               echo "<input type='radio' id='$value' name='categoria' value='$value'";
+               echo Utilidades::verificaControlRadio(Input::get('categoria'), $value);
+               echo "/>";
+               echo "<label for='$value'>$value</label>";
+            }
+            echo "<br>";?>
                    
                 </div>
                 <div class='uno'>
-                    <label>Presenta Lesiones </label><br />
-                    <input type="checkbox" name="lesiones[]" value="hola" />rodilla<br />
-                    <input type="checkbox" name="lesiones[]" value="hombro" />hombro<br />
-                    <input type="checkbox" name="lesiones[]" value="tobillo" />tobillo<br />
-                    <input type="checkbox" name="lesiones[]" value="dedos" />dedos<br />
-                    
                     <label>&nbsp;</label>
+                    <label><b>Presenta Lesiones</b> </label><br />
+               
+                    <?php
+         $lesiones = array("rodilla","hombro", "tobillo", "dedos");
+         foreach ($lesiones as $value) {
+            echo "<input name='lesiones[]' id='$value' type='checkbox' value='$value'";
+            echo Utilidades::verificaCheckbox(Input::get("lesiones"), $value);
+            echo "/>";
+            
+            echo "<label for='$value'>$value</label><br/>";
+         }
+      ?>
+                    
                    
                 </div>
                 </div>
-                <input class="priv" type="checkbox" name="privacidad" value="privacidad" />Acepto las condiciones de Política de Privacidad ..<br />
-           
-            <input type="submit" name="enviar" value="Inscribirse" />
+                <?php
+            $value = "Acepto las condiciones de Politica de Privacidad";
+               echo "<input type='radio' id='$value' name='privacidad' value='$value'";
+               echo Utilidades::verificaControlRadio(Input::get('privacidad'), $value);
+               echo "/>";
+               echo "<label for='$value'>$value</label>";
+            
+            echo "<br>";?>
+            <input type="submit" name="enviar" value="<?php echo $fase ?>" />
 
 </form>
 <?php
 if(!empty($resultado)){
-
+    
     echo "<div class='texto' />";
       echo $resultado;
       echo "</div>";
