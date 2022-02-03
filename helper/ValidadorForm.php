@@ -7,9 +7,9 @@ class ValidadorForm{
 
     public function __construct()
     {
-       $errores = array();
-       $reglasValidacion = null;
-       $valido = false; 
+       $this->errores = array();
+       $this->reglasValidacion = null;
+       $this->valido = false; 
     }
 
     public function validar($fuente, $reglasValidacion){
@@ -37,43 +37,73 @@ class ValidadorForm{
                 if( $nombre == "required" && $regla == true){
                     if (empty($dato)){
                         $this->addErrores($campo, "El campo $campo es requerido");
+                        $this->valido= false;
+                    }
+                }
+                if ($nombre == 'pattern') {
+                    if(preg_match($regla, $dato) === 0){
+                        if ($campo === 'dni') {
+                            $this->addErrores($campo, "El patron de DNI no es correcto, debe consistir en 8 números y 1 letra.");
+                            $this->valido = false;
+                        }
+                        if ($campo === 'telf') {
+                            $this->addErrores($campo, "El patron del teléfono no es correcto, debe consistir en 9 números y que empieze por 6 o 9.");
+                            $this->valido = false;
+                        }
+                        if ($campo === 'email') {
+                            $this->addErrores($campo, "Por favor, introduzca un $campo valido.");
+                            $this->valido = false;
+                        }
                     }
                 }
 
-                if($nombre == "maxLength" && $regla == $fuente[$campo]){
-                    if($dato < $fuente[$campo]){
-                        $this->addErrores($campo, "El campo $campo debe ser mayor a $fuente[$campo] caracteres");
+                if($nombre === "maxLength" ){
+                    if(strlen($dato) > $regla){
+                        $this->addErrores($campo, "El campo $campo no debe contener más de $regla caracteres");
+                        $this->valido= false;
+                    }
+                }
+                if ($nombre === 'datosValidos') {
+                    if(is_array($dato)){
+                        foreach ($dato as $value) {
+                            if($value !== ""){
+                                if(!in_array($value, $regla)) {
+                                    $this->addErrores($campo, "El campo $campo no contiene ese valor.");
+                                    $this->valido = false;
+                                }
+                            }
+                        }
+                    } else {
+                        if($dato !== ""){
+                            if(!in_array($dato, $regla)) {
+                                $this->addErrores($campo, "El campo $campo no contiene ese valor.");
+                                $this->valido = false;
+                            }
+                        }
                     }
                 }
 
-                if($nombre == "tipoDocumentoValido" && $regla == true){
+                if($nombre === "tipoDocumentoValido"){
                     
                     if (!empty($_POST['documento'])){
                         $documento = $_POST['documento'];
-                        $tipo="";
-                        switch($documento){
-                            CASE "dni": $tipo= "dni";
-                            break;
-                            CASE "nif": $tipo = "nif";
-                            break;
+                        $dni = $_POST['dni'];
+                        if($documento == "dni"){
+                           if( !validarDni($dni)){
+                            $this->addErrores($campo, "El campo $campo no cumple con el formato correcto");
+                           
+                        }}
                             
-                        }
-                        if($tipo == "dni"){
-                          if( !validarDni("dni")){
-                               $error="Introduzca un dni correcto";
-                            }
-                        }
-                        if($tipo == "nif"){
-                            if( !validarNif("nif")){
-                                 $error="Introduzca un nif correcto";
-                              }
-                          }
-                         
                         }  
+
+
                 }
           }
         }
-       // $this->valido
+        //si no contiene errores se da por valido, y el parametro valido pasa a ser true
+        if(count($this->errores) == 0){
+        $this->valido =true;
+        }
     }
     /**
      * Añade error al array $errores en la clave asignada campos 
@@ -84,15 +114,18 @@ class ValidadorForm{
 
     }
 
-    /**
-     * Devuelve el valor de la propiedad valido
+    /** 
+     * Devuelve el valor de la propiedad valido 
      */
     public function esValido(){
         return $this->valido;
     }
-
+    
+    /**
+     * Devuelve los errores encontrados
+     */
     public function getErrores(){
-        return $this-> errores;
+        return $this->errores;
     
     }
     /**

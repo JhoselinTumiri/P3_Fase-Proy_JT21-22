@@ -9,14 +9,14 @@ class Input{
 
     public static function  siEnviado(){
 
-        // return (!empty($_POST)) ? true : false;
-        
-        if (!isset($_POST)){
-            return false;
-        }
-        else{
+       return(!empty($_POST)) ? true : false;
+       
+      /* if (isset($_POST)){
             return true;
         }
+        else{
+            return false;
+        }*/
     }
 
     /** 
@@ -29,7 +29,7 @@ class Input{
 
         if(isset($_POST[$dato])){
             $campo = $_POST[$dato];
-            $campos = Input::filtrarDato($campo);
+            $campos = self::filtrarDato($campo);
         }
         else{
             $campos = "";
@@ -45,30 +45,29 @@ class Input{
         
         if(is_array($datos)){
             if(isset($datos)){
-                $datosFiltrados=array();
+                $datosFiltrados=[];
                 foreach($datos as $dato){
-                    /**
-                     * htmlspecialchars(), devuelve un string libre de carácteres especiales, convirtiendo estos de html(maliciosos o no)
-                     * que cuando se muestre por pantalla o se guarde sea como un string.
-                     */
-                    $dato = htmlspecialchars($dato);
+                    // htmlspecialchars(), devuelve un string libre de carácteres especiales, convirtiendo estos de html(maliciosos o no)
+                    //que cuando se muestre por pantalla o se guarde sea como un string.
+                    $datoA = htmlspecialchars($dato);
 
                     // Retira las etiquetas HTML y PHP de un string
                     // Esta función intenta devolver un string con todos los bytes NULL y las etiquetas HTML y PHP retirados de un str
                     // dado. Se utiliza la misma máquina de estado de retirado de etiquetas que la función fgetss().
-                    $dato = strip_tags($dato);
+                    $datoA = strip_tags($dato);
                     //trim(), su función es eliminar espacios en blanco, tabulaciones, saltos de linea, nulls, retornos de carro en un string 
-                    //$dato = trim($dato);
+                    $dato = trim($dato);
                     //array_push - Inserta uno o más elemntos al final de un array.
-                    array_push($datosFiltrados, $dato);
+                    array_push($datosFiltrados, $datoA);
                 }
             }
          }
          else {
             //En el caso de que no se tratase de un array
+            
             $datos = htmlspecialchars($datos);
             $datos = strip_tags($datos);
-            $datos = trim($datos);
+            $datos= trim($datos);
             $datosFiltrados = $datos;
 
          }
