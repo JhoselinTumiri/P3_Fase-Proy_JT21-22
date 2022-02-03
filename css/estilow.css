@@ -195,9 +195,12 @@ option {
 .datos{
     margin-left: 5%;
 }
-.dniCasilla{
-
-}
 label{
     margin-left: 5px;
+}
+
+.errores{
+    color:rgb(179, 31, 31);
+    font-size: 17px;
+    padding-left: 5%;
 }
