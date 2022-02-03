@@ -1,5 +1,7 @@
 <?php
 include "includes/funciones.php";
+include "helper/Input.php";
+include "helper/ValidadorForm.php";
 class Controlador
 {
     public function run()
@@ -7,124 +9,23 @@ class Controlador
         if (!isset($_POST['enviar']))//no se ha enviado el formulario
         { // primera petición
             //se llama al método para mostrar el formulario inicial
-            $this->mostrarFormulario(null);
+            $this->mostrarFormulario("validar",null,null);
 			exit();
-        } else
-        {
-            $resultado ="<center><b> COMPROBANTE DE INSCRIPCIÓN</b></center></br>";
-            //el formulario ya se ha enviado
-            //se recogen y procesan los datos
-            //se llama al método para mostrar el resultado
-            if (!empty($_POST['nombre'])){
-            $nombre=$_POST['nombre'];
-            $resultado .= " $nombre ";
-            }
-
-            //Mostrar un apellido
-            //Se registra el primer apellido en caso de que se haya marcado la casilla Sin 2Ap 
-            if (!empty($_POST['apellido1']) && empty($_POST['apellido2']) && isset($_POST['sin2AP'])){
-            $apellido1=$_POST['apellido1'];
-            $resultado .= " $apellido1 se ha registrado correctamente <br />";
-            }
-
-            //Mostrar los 2 apellidos
-            if (!empty($_POST['apellido1']) && !empty($_POST['apellido2'])){
-                $apellido1=$_POST['apellido1'];
-                $apellido2=$_POST['apellido2'];
-                $resultado .= " $apellido1 $apellido2 se ha resgidtrado correctamente<br />";
-                }
-
-            //Mostrar tipo de documento elegido
-            if (!empty($_POST['documento'])){
-                $documento = $_POST['documento'];
-                $tipo="";
-                switch($documento){
-                    CASE "dni": $tipo= "dni";
-                    break;
-                    CASE "nif": $tipo = "nif";
-                    break;
-                }
-                if($tipo == "dni"){
-                  if( !validarDni("dni")){
-                       $error="Introduzca un dni correcto";
-                    }
-                }
-               
-                 
-
-                $resultado .= "</br>DNI/NIF = $tipo <br />";
-                }  
-            
-            //Mostrar teléfono
-            if (!empty($_POST['telf'])){
-                $telf = $_POST['telf'];
-                $resultado .= "</br>Contacto  = $telf <br />";
-                }
-            
-            //Mostrar Correo, comprobando que se encuentre. 
-            if (!empty($_POST['email'])){
-                $email = $_POST['email'];
-                $resultado .= "</br>Correo electrónico = $email <br />";
-                }
-            //Comprobar el tipo de sexo
-            if (isset($_POST['sexo'])) {
-                $sexo = $_POST['sexo'];
-                $resultado .= " <br>Sexo:  ";
-                switch ($sexo) {
-                    case "hombre":
-                        $resultado .= "HOMBRE ";
-                        break;
-                    case "mujer":
-                        $resultado .= "MUJER";
-                        break;
-                }
-            }
-
-            //Comprobar la categoria a la que corresponde
-            if (isset($_POST['categoria'])) {
-                $categoria = $_POST['categoria'];
-                $resultado .= " <br>Categoria a la que corresponde:  ";
-                switch ($categoria) {
-                    case "cadete":
-                        $resultado .= "CADETE ";
-                        break;
-                    case "juvenil":
-                        $resultado .= "JUVENIL";
-                        break;
-                    case "mayores":
-                        $resultado .= "MAYORES";
-                        break;
-                }
-            }
-            /*
-             * Comprobar fecha de Nacimiento(obligatorio en html por defecto)
-            */
-            if(isset($_POST['fechaN'])){
-                $fechaN= $_POST['fechaN'];
-                $resultado .= "<br>fecha de Nacimiento: $fechaN";
-            }
-           
-            /*
-             *Comprobar casillas elegidas, se trata como un array, se recorre el array y se muestra
-             *aquellas casillas que se hayan seleccionado, si se encuentra vacia se muestra otro mensaje
-            */
-
-            if(isset($_POST["lesiones"])){
-                $lesiones = $_POST["lesiones"];
-                $resultado .= "</br>Presenta las siguientes lesiones: ";
-                foreach($lesiones as $lesion){
-                    $resultado .= "<br>Lesión en $lesion";
-                }
-                
-            }
-            else{
-                $resultado .= "</br>NO PRESENTA LESIÓN ALGUNA ";
-            }
-             
-            $resultado .= "<br />";
-            $this->mostrarFormulario($resultado);
-			exit();		
+        } 
+        if(isset($_POST['enviar']) && ($_POST['enviar']) == 'validar'){
+            //valida formulario
+            $this->validar();
+            exit();
         }
+        if(isset($_POST['enviar']) && ($_POST['enviar']) == 'continuar'){
+           //terminar
+           unset($_POST);//se deja limpio $_POST, un formulario limpio
+           //echo 'Programa Finalizado';
+           $this->mostrarFormulario("validar", null, null);
+           exit();
+           //
+        }
+       
     }
 
     /**
@@ -137,16 +38,20 @@ class Controlador
      public function crearReglasDeValidacion(){
          $reglasValidacion = array(
              "nombre"=>array("maxLength"=> 30, "required"=>true),
-             "apellido1"=>array("maxLength"=> 20, "required"=>true),
-             "apellido2"=>array("maxLength"=> 20, "required"=>false),
-             "documento"=>array("tipoDocumentoValido"=>true, "required"=>true),
-             "telf"=>array("pattern" => "/(\+34|0034|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}/","required"=>true),//"/^(6|9)[ -]*([0-9][ -]*){8}/", "maxlength" => 9,
-             "email"=>array("filtradoPHP"=> true, "required"=>true),//"/[a-zA-Z0-9!#$%&'*_+-]([\.]?[a-zA-Z0-9!#$%&'*_+-])+@[a-zA-Z0-9]([^@&%$\/()=?¿!.,:;]|\d)+[a-zA-Z0-9][\.][a-zA-Z]{2,4}([\.][a-zA-Z]{2})?/"
-             "sexo"=>array("datosValidos"=>array("mujer", "hombre"),"required"=>true),
+             "apellido1"=>array("maxLength"=> 15, "required"=>true),
+             "apellido2"=>array("maxLength"=> 15, "required"=>false),
+             //"DNI"=>array("pattern" => "/^[0-9]{8}[a-z,A-Z]$/", "required"=>true),
+             "dni"=>array("pattern" => "/^[0-9]{8}[a-z,A-Z]$/", "maxLength"=> 9,"required"=>true),
+             "telf"=>array("pattern"=> "/^(6|9)[ -]*([0-9][ -]*){8}/", "maxLength" => 9,"required"=>true),//"/^(6|9)[ -]*([0-9][ -]*){8}/", "maxlength" => 9,
+             "email"=>array("pattern" =>"/[a-zA-Z0-9!#$%&'*_+-]([\.]?[a-zA-Z0-9!#$%&'*_+-])+@[a-zA-Z0-9]([^@&%$\/()=?¿!.,:;]|\d)+[a-zA-Z0-9][\.][a-zA-Z]{2,4}([\.][a-zA-Z]{2})?/", "required"=>true),//"filtradoPHP"=> true
+             "sexo"=>array("datosValidos"=>array("Hombre", "Mujer"),"required"=>true),
              "fechaN"=>array("pattern"=> "/^(0[1-9]|[1-2]\d|3[01])(\/)(0[1-9]|1[012])\2(\d{4})$/","required"=>true),
-             "categoria"=>array("datosValidos"=>array("cadete", "juvenil", "mayores"),"required"=>true),
-             "lesiones[]"=>array("datosValidos"=>array("rodilla", "hombro", "tobillo", "dedos"),"required"=>false)
-         );
+             "categoria"=>array("datosValidos"=>array("Cadete", "Juvenil", "Mayores"),"required"=>true),
+             "lesiones[]"=>array("datosValidos"=>array("rodilla", "hombro", "tobillo", "dedos"),"required"=>false),
+       
+             "privacidad"=>array("required"=>true)
+            );
+         return $reglasValidacion;
      }
 
     /**
@@ -156,7 +61,62 @@ class Controlador
     public function validar(){
         $validador = new ValidadorForm();
         $reglasValidacion = $this->crearReglasDeValidacion();
-                                                                                                                                                                                                                                                                                                                                                                
+        $validador->validar($_POST, $reglasValidacion);
+        if($validador->esValido()){
+            //Formulario correcto, recoger datos
+            //volver a mostrar formulario con resultado correcto
+    
+            $resultado = "";
+            //el formulario ya se ha enviado
+            //se recogen y procesan los datos
+            
+            if (!empty($_POST['apellido1']) && !empty($_POST['apellido2']) && !isset($_POST['sin2AP'])){
+                $nombre = Input::filtrarDato($_POST['nombre']);
+                $apellido1=Input::filtrarDato($_POST['apellido1']);
+                $apellido2 = Input::filtrarDato($_POST['apellido2']); 
+                $completo= "$nombre $apellido1 $apellido2 se ha resgistrado correctamente<br />";
+                }
+             if(!empty($_POST['apellido1']) && isset($_POST['sin2AP'])){
+                    $nombre = Input::filtrarDato($_POST['nombre']);
+                    $apellido1=Input::filtrarDato($_POST['apellido1']);
+                    $completo = "$nombre $apellido1 se ha registrado correctamente"; 
+                }
+            else if(!empty($_POST['apellido1']) && empty($_POST['apellido2'])){
+                $nombre = Input::filtrarDato($_POST['nombre']);
+                $apellido1=Input::filtrarDato($_POST['apellido1']);
+                $completo = "$nombre $apellido1 se ha registrado correctamente"; 
+            }
+            $resultado .=  strtoupper($completo);
+            $resultado .= "<p>Los datos registrados son los siguientes</p> ";
+           
+            $array = array(
+                
+               
+                "DNI: " => Input::filtrarDato($_POST['dni']) ?? "",
+                "Genero: " => Input::filtrarDato($_POST['sexo']) ?? "",
+                "Teléfono: " => Input::filtrarDato($_POST['telf']) ?? "",
+                "Direccion: " =>Input::filtrarDato( $_POST['email']) ?? "",
+                "Fecha de Nacimiento: " => Input::filtrarDato($_POST['fechaN']) ?? "",
+                "Categoria : " => Input::filtrarDato($_POST['categoria']) ?? "",
+                "Email: " => Input::filtrarDato($_POST['email']) ?? "",
+                "Presenta las siguientes lesiones: <br>Lesión en:" => isset($_POST['lesiones'])? implode(', ',$_POST['lesiones']) : "NO PRESENTA LESIÓN ALGUNA" 
+            );
+            foreach ($array as $key => $value) {
+                
+                if(isset($value) && $value !== ""){
+                    $resultado .= "$key $value <br>";
+                
+                }
+            }
+
+          
+
+            $this->mostrarFormulario("continuar", $validador, $resultado);
+            exit();
+        }  
+        //Si el formulario no es válido, mostrarlo nuevamente con los errores
+        $this->mostrarFormulario("validar", $validador, null);
+        exit();                                                                                                                                                                                                                                                                                                                                                      
     }
 
     /*private function mostrarFormulario()
@@ -164,9 +124,9 @@ class Controlador
      //se muestra la vista del formulario (la plantilla form_bienvenida.php)   
         include 'vistas/form_bienvenida.php';
     }*/
-    private function mostrarFormulario($resultado)
+    private function mostrarFormulario($fase, $validador, $resultado)
     {
-    // y se muestra la vista del resultado (la plantilla resultado.php)
+    // y se muestra la vista del formulario (la plantilla form_bienvenida.php)
         include 'vistas/form_bienvenida.php';
     }
 }
