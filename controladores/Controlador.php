@@ -1,9 +1,17 @@
 <?php
-include "includes/funciones.php";
-include "helper/Input.php";
+include "modelo/Registro.php";
 include "helper/ValidadorForm.php";
-class Controlador
-{
+include 'modelo/DaoRegistro.php';
+
+class Controlador{
+
+    private $daoRG;
+
+    function __construct()
+    {
+        $this->daoRG= new DaoRegistro();
+    }
+
     public function run()
     {
         if (!isset($_POST['enviar']))//no se ha enviado el formulario
@@ -27,6 +35,18 @@ class Controlador
         }
        
     }
+    
+    /*private function mostrarFormulario()
+    {
+     //se muestra la vista del formulario (la plantilla form_bienvenida.php)   
+        include 'vistas/form_bienvenida.php';
+    }*/
+    private function mostrarFormulario($fase, $validador, $resultado)
+    {
+    // y se muestra la vista del formulario (la plantilla form_bienvenida.php)
+        include 'vistas/form_bienvenida.php';
+    }
+
 
     /**
      * Creamos un método para crear un array con  las reglas de validación que sean necesarias
@@ -61,54 +81,21 @@ class Controlador
     public function validar(){
         $validador = new ValidadorForm();
         $reglasValidacion = $this->crearReglasDeValidacion();
-        $validador->validar($_POST, $reglasValidacion);
+        $datosAvalidar = $_POST;
+        $validador->validar($datosAvalidar, $reglasValidacion);
         if($validador->esValido()){
-            //Formulario correcto, recoger datos
-            //volver a mostrar formulario con resultado correcto
-    
-            $resultado = "";
-            //el formulario ya se ha enviado
-            //se recogen y procesan los datos
-            
-            if (!empty($_POST['apellido1']) && !empty($_POST['apellido2']) && !isset($_POST['sin2AP'])){
-                $nombre = Input::filtrarDato($_POST['nombre']);
-                $apellido1=Input::filtrarDato($_POST['apellido1']);
-                $apellido2 = Input::filtrarDato($_POST['apellido2']); 
-                $completo= "$nombre $apellido1 $apellido2 se ha resgistrado correctamente<br />";
-                }
-             if(!empty($_POST['apellido1']) && isset($_POST['sin2AP'])){
-                    $nombre = Input::filtrarDato($_POST['nombre']);
-                    $apellido1=Input::filtrarDato($_POST['apellido1']);
-                    $completo = "$nombre $apellido1 se ha registrado correctamente"; 
-                }
-            else if(!empty($_POST['apellido1']) && empty($_POST['apellido2'])){
-                $nombre = Input::filtrarDato($_POST['nombre']);
-                $apellido1=Input::filtrarDato($_POST['apellido1']);
-                $completo = "$nombre $apellido1 se ha registrado correctamente"; 
-            }
-            $resultado .=  strtoupper($completo);
-            $resultado .= "<p>Los datos registrados son los siguientes</p> ";
-           
-            $array = array(
-                
-               
-                "DNI: " => Input::filtrarDato($_POST['dni']) ?? "",
-                "Genero: " => Input::filtrarDato($_POST['sexo']) ?? "",
-                "Teléfono: " => Input::filtrarDato($_POST['telf']) ?? "",
-                "Direccion: " =>Input::filtrarDato( $_POST['email']) ?? "",
-                "Fecha de Nacimiento: " => Input::filtrarDato($_POST['fechaN']) ?? "",
-                "Categoria : " => Input::filtrarDato($_POST['categoria']) ?? "",
-                "Email: " => Input::filtrarDato($_POST['email']) ?? "",
-                "Presenta las siguientes lesiones: <br>Lesión en:" => isset($_POST['lesiones'])? implode(', ',$_POST['lesiones']) : "NO PRESENTA LESIÓN ALGUNA" 
-            );
-            foreach ($array as $key => $value) {
-                
-                if(isset($value) && $value !== ""){
-                    $resultado .= "$key $value <br>";
-                
-                }
-            }
 
+            $resul = $this->daoRG->existeDeportista($datosAvalidar['dni']);
+            if(is_string($resul)){
+                $resultado = $resul;
+            } else {
+                if(!$resul){
+                    $deportista = $this->crearDeportista($datosAvalidar);
+                    $resultado = $this->daoRG->insertarDeportista($deportista);
+                } else {
+                    $resultado = "Ya existe un deportista registrado con el DNI: " . $datosAvalidar['dni'] . ", solo se pude registrar un deportista por DNI.";
+                }
+            }
           
 
             $this->mostrarFormulario("continuar", $validador, $resultado);
@@ -119,14 +106,19 @@ class Controlador
         exit();                                                                                                                                                                                                                                                                                                                                                      
     }
 
-    /*private function mostrarFormulario()
-    {
-     //se muestra la vista del formulario (la plantilla form_bienvenida.php)   
-        include 'vistas/form_bienvenida.php';
-    }*/
-    private function mostrarFormulario($fase, $validador, $resultado)
-    {
-    // y se muestra la vista del formulario (la plantilla form_bienvenida.php)
-        include 'vistas/form_bienvenida.php';
+    
+    /**
+     * Función que filtra los datos y crea un obj Registro
+     * 
+     * @param array $datos array con los datos validados del $_POST(datos del formulario para crear el registro de deportistas)
+     * 
+     * @return Registro devuelve un obj Registro
+     */
+
+    private function crearDeportista($datos){
+        foreach ($datos as $value) {
+            $datos[] = Input::filtrarDato($value);
+        }
+        return new Registro($datos['nombre'], $datos['apellido1'], $datos['apellido2'], $datos['dni'], $datos['sexo'], $datos['telf'], $datos['email'],$datos['fechaN'], $datos['categoria'], (isset($datos['lesiones']) ? implode(', ',$datos['lesiones']) : null), $datos['privacidad']);
     }
 }
