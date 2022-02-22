@@ -1,18 +1,15 @@
 <?php
 include "cabecera.php";
-//include "helper/Input.php";
 include "helper/Utilidades.php";
 
-//Se muestran los errores encontrados en el formulario en esta parte superior
-
-    if(Input::siEnviado()){
+//Comprueba si la variable $validador contiene algo y si hay errores
+    
+    if(isset($validador)){
         $errores = $validador->getErrores();
-        if( !empty($errores)){
-            echo "<div class = 'errores'>";
-            foreach($errores as $campo => $mensajeError){
-                echo "<p>$mensajeError";
+        if( isset($errores)){
+            foreach($errores as $value){
+                echo "<p>$value";
             }
-            echo "</div>";
         }
     }
 ?>
@@ -29,15 +26,7 @@ include "helper/Utilidades.php";
             
             <label>Apellido 2 </label>
             <input type="text" name="apellido2" value='<?php echo Input::get('apellido2')?>'/>
-          <!-- <?/*php
-            $value = "Sin 2ºApellido";
-               echo "<input type='radio' id='$value' name='sin2AP' value='$value'";
-               echo Utilidades::verificaControlRadio(Input::get('sin2AP'), $value);
-               echo "/>";
-               echo "<label for='$value'>$value</label>";
-            
-            echo "<br>";*/?>-->
-            
+        
             <div class="datos">
             DNI/NIE<select class= "dniCasilla" name="documento" holder="Seleccionar tipo de Documento">
                  <option value="select" selected>Seleccionar Tipo de Documento</option>    
@@ -50,7 +39,7 @@ include "helper/Utilidades.php";
             <label>telf</label>
             <input type="tel" name="telf" value='<?php echo Input::get('telf')?>'/>
             <label>Email</label>
-            <input type="email" name="email" value='<?php echo Input::get('email')?>' />
+            <input  name="email" value='<?php echo Input::get('email')?>' />
             </div>
         </div>
             <div>
@@ -71,7 +60,6 @@ include "helper/Utilidades.php";
                    
                     </section>
                     <section>
-                    <!--<label>&nbsp;</label>-->
                     <label><b>Fecha de Nacimiento</b></label>
                     <input type="date" name="fechaN" value='<?php echo Input::get('fechaN')?>' />
                     </section>
